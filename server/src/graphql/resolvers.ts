@@ -3,6 +3,8 @@ import { AuthenticationError } from 'apollo-server';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import type { Context } from './context.js'; // Define a context type if not already defined
+import { handleError } from '../utils/errorHandler.js'; // Adjust the import path as necessary
+
 dotenv.config();
 
 const resolvers = {
@@ -13,33 +15,64 @@ const resolvers = {
       }
       try {
         const user = await User.findById(context.user.id).populate('savedBooks');
+        if (!user) {
+          throw new Error('User not found');
+        }
         return user;
       } catch (err) {
-        console.error('Error fetching user:', err);
-        throw new Error('Failed to fetch user');
+        handleError(err, 'Failed to fetch user');
+        return null;
       }
     },
   },
+
   Mutation: {
     login: async (_parent: any, { email, password }: { email: string; password: string }) => {
-      const user = await User.findOne({ email });
-      if (!user) {
-        throw new AuthenticationError('Invalid credentials');
+      if (!email || !password) {
+        throw new Error('Email and password are required');
       }
+      try {
+        const user = await User.findOne({ email });
+        if (!user) {
+          throw new AuthenticationError('Invalid credentials');
+        }
 
-      const isValid = await user.isCorrectPassword(password);
-      if (!isValid) {
-        throw new AuthenticationError('Invalid credentials');
+        const isValid = await user.isCorrectPassword(password);
+        if (!isValid) {
+          throw new AuthenticationError('Invalid credentials');
+        }
+
+        const token = jwt.sign(
+          { _id: user._id, email: user.email, username: user.username },
+          process.env.JWT_SECRET_KEY || 'default_secret',
+          { expiresIn: '1h' }
+        );
+        return { token, user };
+      } catch (err) {
+        handleError(err, 'Failed to log in');
+        return null;
       }
-
-      const token = jwt.sign({ _id: user._id, email: user.email, username: user.username }, process.env.JWT_SECRET_KEY || 'default_secret', { expiresIn: '1h' });
-      return { token, user };
     },
+
     addUser: async (_: unknown, { username, email, password }: { username: string; email: string; password: string }) => {
-      const user = await User.create({ username, email, password });
-      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY || '', { expiresIn: '2h' });
-      return { token, user };
+      if (!username || !email || !password) {
+        throw new Error('All fields are required');
+      }
+      try {
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+          throw new Error('Email is already in use');
+        }
+
+        const user = await User.create({ username, email, password });
+        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY || '', { expiresIn: '2h' });
+        return { token, user };
+      } catch (err) {
+        handleError(err, 'Failed to create user');
+        return null;
+      }
     },
+
     saveBook: async (
       _: unknown,
       { bookId, title, authors, description, image, link }: { bookId: string; title: string; authors: string[]; description: string; image: string; link: string },
@@ -48,23 +81,53 @@ const resolvers = {
       if (!context.user) {
         throw new AuthenticationError('Not logged in');
       }
-      const updatedUser = await User.findByIdAndUpdate(
-        context.user.id,
-        { $addToSet: { savedBooks: { bookId, title, authors, description, image, link } } },
-        { new: true }
-      ).populate('savedBooks');
-      return updatedUser;
+      if (!bookId || !title) {
+        throw new Error('Book ID and title are required');
+      }
+      try {
+        const user = await User.findById(context.user.id);
+        if (!user) {
+          throw new Error('User not found');
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+          context.user.id,
+          { $addToSet: { savedBooks: { bookId, title, authors, description, image, link } } },
+          { new: true }
+        ).populate('savedBooks');
+        return updatedUser;
+      } catch (err) {
+        handleError(err, 'Failed to save book');
+        return null;
+      }
     },
+
     removeBook: async (_: unknown, { bookId }: { bookId: string }, context: Context) => {
       if (!context.user) {
         throw new AuthenticationError('Not logged in');
       }
-      const updatedUser = await User.findByIdAndUpdate(
-        context.user.id,
-        { $pull: { savedBooks: { bookId } } },
-        { new: true }
-      ).populate('savedBooks');
-      return updatedUser;
+      if (!bookId) {
+        throw new Error('Book ID is required');
+      }
+      try {
+        const user = await User.findById(context.user.id);
+        if (!user) {
+          throw new Error('User not found');
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+          context.user.id,
+          { $pull: { savedBooks: { bookId } } },
+          { new: true }
+        ).populate('savedBooks');
+        if (!updatedUser) {
+          throw new Error('Failed to remove book');
+        }
+        return updatedUser;
+      } catch (err) {
+        handleError(err, 'Failed to remove book');
+        return null;
+      }
     },
   },
 };
