@@ -6,12 +6,26 @@ import { GET_ME, REMOVE_BOOK } from '../utils/graphql';
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
 
+interface Book {
+  bookId: string;
+  image?: string;
+  title: string;
+  authors?: string[];
+  description?: string;
+}
+
+interface UserData {
+  username?: string;
+  savedBooks?: Book[];
+}
+
 const SavedBooks = () => {
   const { loading, data } = useQuery(GET_ME);
   const [removeBookMutation] = useMutation(REMOVE_BOOK);
 
-  const userData = data?.me || {};
-
+  const userData: UserData = data?.me || {};
+  console.log('SavedBooks component reached');
+  
   const handleDeleteBook = async (bookId: string) => {
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
@@ -55,7 +69,7 @@ const SavedBooks = () => {
             : 'You have no saved books!'}
         </h2>
         <Row>
-          {userData.savedBooks?.map((book) => {
+          {userData.savedBooks?.map((book: Book) => {
             return (
               <Col md='4' key={book.bookId}>
                 <Card border='dark'>

@@ -4,6 +4,7 @@ import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from '@ap
 import { setContext } from '@apollo/client/link/context';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
+
 import { onError } from '@apollo/client/link/error';
 import { setLogVerbosity } from '@apollo/client';
 
@@ -51,5 +52,6 @@ root.render(
         <App />
       </BrowserRouter>
     </ApolloProvider>
+
   </React.StrictMode>
 );

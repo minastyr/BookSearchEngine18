@@ -15,6 +15,7 @@ import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 import { searchGoogleBooks } from '../utils/API';
 import type { Book } from '../models/Book';
 import type { GoogleAPIBook } from '../types/GoogleAPIBook';
+console.log('SearchBooks component reached');
 
 const SearchBooks = () => {
   // create state for holding returned google api data
@@ -35,6 +36,7 @@ const SearchBooks = () => {
   // create method to search for books and set state on form submit
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    
 
     if (!searchInput) {
       return false;
