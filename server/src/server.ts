@@ -21,11 +21,11 @@ const PORT = process.env.PORT || 4000;
 app.use(express.json());
 
 // Serve static files from the React app
-app.use(express.static(path.join(__dirname, '../../client/build')));
+app.use(express.static(path.join(__dirname, '../../client/dist')));
 
 // Catch-all route to serve the React app
 app.get('*', (_req, res) => {
-    res.sendFile(path.join(__dirname, '../../client/build', 'index.html'));
+    res.sendFile(path.join(__dirname, '../../client/dist', 'index.html'));
 });
 
 // Middleware for authentication
