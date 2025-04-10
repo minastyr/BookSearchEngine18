@@ -55,6 +55,7 @@ const startServer = async () => {
       // Pass the authenticated user to the context
       return { user: req.user };
     },
+    cache: "bounded",
   });
 
   // Start Apollo Server
