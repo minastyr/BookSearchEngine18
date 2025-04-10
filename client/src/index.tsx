@@ -4,6 +4,9 @@ import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from '@ap
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import { onError } from '@apollo/client/link/error';
+import { setLogVerbosity } from '@apollo/client';
+
+setLogVerbosity('debug');
 
 const httpLink = createHttpLink({
   uri: 'https://booksearchengine18.onrender.com/graphql',
