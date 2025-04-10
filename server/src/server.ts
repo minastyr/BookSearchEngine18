@@ -5,6 +5,7 @@ import typeDefs from './graphql/typeDefs.js';
 import resolvers from './graphql/resolvers.js';
 import jwt from 'jsonwebtoken';
 import db from './config/connection.js';
+import path from 'path';
 
 dotenv.config();
 
@@ -13,6 +14,14 @@ const PORT = process.env.PORT || 4000;
 
 // Middleware to parse JSON requests
 app.use(express.json());
+
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '../../client/build')));
+
+// Catch-all route to serve the React app
+app.get('*', (_req, res) => {
+    res.sendFile(path.join(__dirname, '../../client/build', 'index.html'));
+});
 
 // Middleware for authentication
 app.use((req, _res, next) => {
