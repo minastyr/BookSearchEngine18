@@ -6,8 +6,13 @@ import resolvers from './graphql/resolvers.js';
 import jwt from 'jsonwebtoken';
 import db from './config/connection.js';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
+
+// Resolve __dirname for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app: Application = express();
 const PORT = process.env.PORT || 4000;
