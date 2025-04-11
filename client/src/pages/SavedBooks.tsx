@@ -75,7 +75,7 @@ const SavedBooks = () => {
                 <Card border='dark'>
                   {book.image ? (
                     <Card.Img
-                      src={book.image}
+                    src={book.image?.replace('http://', 'https://')}
                       alt={`The cover for ${book.title}`}
                       variant='top'
                     />
