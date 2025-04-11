@@ -16,6 +16,7 @@ import { searchGoogleBooks } from '../utils/API';
 import type { Book } from '../models/Book';
 import type { GoogleAPIBook } from '../types/GoogleAPIBook';
 console.log('SearchBooks component reached');
+console.log('Is user logged in?', Auth.loggedIn());
 
 const SearchBooks = () => {
   // create state for holding returned google api data
