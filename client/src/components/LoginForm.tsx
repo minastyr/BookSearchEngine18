@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { useMutation } from '@apollo/client';
+import { LOGIN_USER } from '../utils/graphql';
 import Auth from '../utils/auth';
 import { Form, Button } from 'react-bootstrap';
 
 const LoginForm = ({ handleModalClose }: { handleModalClose: () => void }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [login, { error }] = useMutation(LOGIN_USER);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Replace with your login API logic
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        body: JSON.stringify({ email, password }),
-        headers: { 'Content-Type': 'application/json' },
+      const { data } = await login({
+        variables: { email, password },
       });
-      const data = await response.json();
-      if (data.token) {
-        Auth.login(data.token);
+
+      if (data?.login?.token) {
+        Auth.login(data.login.token);
         handleModalClose();
       }
     } catch (err) {
-      console.error(err);
+      console.error('Login error:', err);
     }
   };
 
@@ -47,8 +47,9 @@ const LoginForm = ({ handleModalClose }: { handleModalClose: () => void }) => {
           required
         />
       </Form.Group>
+      {error && <p className="text-danger">Login failed. Please try again.</p>}
       <Button variant="primary" type="submit" className="mt-3">
-        Submit
+        Login
       </Button>
     </Form>
   );
