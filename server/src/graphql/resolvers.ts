@@ -78,6 +78,8 @@ const resolvers = {
       { bookId, title, authors, description, image, link }: { bookId: string; title: string; authors: string[]; description: string; image: string; link: string },
       context: Context
     ) => {
+      console.log('Input variables:', { bookId, title, authors, description, image, link }); // Add this line
+      console.log('Context user:', context.user); // Add this line
       if (!context.user) {
         throw new AuthenticationError('Not logged in');
       }
