@@ -1,103 +1,134 @@
-//import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Container, Card, Button, Row, Col } from 'react-bootstrap';
-
+//import Auth from '../utils/auth';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_ME, REMOVE_BOOK } from '../utils/graphql';
-import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
 
-interface Book {
-  bookId: string;
-  image?: string;
+type Book = {
+  _id: string;
   title: string;
-  authors?: string[];
-  description?: string;
-}
-
-interface UserData {
-  username?: string;
-  savedBooks?: Book[];
-}
+  authors: string[];
+  description: string;
+  image: string;
+  link: string;
+};
 
 const SavedBooks = () => {
-  const { loading, data } = useQuery(GET_ME);
-  const [removeBookMutation] = useMutation(REMOVE_BOOK);
+  const [savedBooks, setSavedBooks] = useState<Book[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
-  const userData: UserData = data?.me || {};
-  console.log('SavedBooks component reached');
-  
-  const handleDeleteBook = async (bookId: string) => {
-    const token = Auth.loggedIn() ? Auth.getToken() : null;
+  const { data, loading: queryLoading, error: queryError } = useQuery(GET_ME);
+  const [removeBook] = useMutation(REMOVE_BOOK);
 
-    if (!token) {
-      return false;
+  useEffect(() => {
+    if (data && data.me) {
+      setSavedBooks(data.me.savedBooks);
+      setLoading(false);
     }
+    if (queryError) {
+      setError('Failed to load saved books. Please try again later.');
+      setLoading(false);
+    }
+  }, [data, queryError]);
+
+  const handleRemoveBook = async (bookId: string) => {
+    const confirmRemove = window.confirm('Are you sure you want to remove this book?');
+    if (!confirmRemove) return;
 
     try {
-      await removeBookMutation({
+      const { data } = await removeBook({
         variables: { bookId },
       });
 
-      removeBookId(bookId);
+      if (data?.removeBook) {
+        setSavedBooks(savedBooks.filter((book) => book._id !== bookId));
+        removeBookId(bookId);
+      }
     } catch (err) {
       console.error(err);
     }
   };
 
-  // if data isn't here yet, say so
-  if (loading) {
-    return <h2>LOADING...</h2>;
+  if (loading || queryLoading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container my-4">
+        <div className="alert alert-danger text-center" role="alert">
+          {error}
+        </div>
+        <button
+          className="btn btn-secondary"
+          onClick={() => navigate('/')}
+        >
+          Back to Search
+        </button>
+      </div>
+    );
   }
 
   return (
-    <>
-      <div className='text-light bg-dark p-5'>
-        <Container>
-          {userData.username ? (
-            <h1>Viewing {userData.username}'s saved books!</h1>
-          ) : (
-            <h1>Viewing saved books!</h1>
-          )}
-        </Container>
-      </div>
-      <Container>
-        <h2 className='pt-5'>
-          {userData.savedBooks?.length
-            ? `Viewing ${userData.savedBooks.length} saved ${
-                userData.savedBooks.length === 1 ? 'book' : 'books'
-              }:`
-            : 'You have no saved books!'}
-        </h2>
+    <Container className="my-4">
+      <Button
+        className="btn btn-secondary mb-4"
+        onClick={() => navigate('/')}
+      >
+        Back to Search
+      </Button>
+      <h2 className="text-center mb-4">Your Saved Books</h2>
+      {savedBooks.length === 0 ? (
+        <div className="alert alert-warning text-center" role="alert">
+          You have no saved books. Start searching and save your favorite books!
+        </div>
+      ) : (
         <Row>
-          {userData.savedBooks?.map((book: Book) => {
-            return (
-              <Col md='4' key={book.bookId}>
-                <Card border='dark'>
-                  {book.image ? (
-                    <Card.Img
-                    src={book.image?.replace('http://', 'https://')}
-                      alt={`The cover for ${book.title}`}
-                      variant='top'
-                    />
-                  ) : null}
-                  <Card.Body>
-                    <Card.Title>{book.title}</Card.Title>
-                    <p className='small'>Authors: {book.authors}</p>
-                    <Card.Text>{book.description}</Card.Text>
-                    <Button
-                      className='btn-block btn-danger'
-                      onClick={() => handleDeleteBook(book.bookId)}
-                    >
-                      Delete this Book!
-                    </Button>
-                  </Card.Body>
-                </Card>
-              </Col>
-            );
-          })}
+          {savedBooks.map((book) => (
+            <Col key={book._id} md="4" className="mb-4">
+              <Card className="h-100">
+                <Card.Img
+                  src={book.image}
+                  alt={book.title}
+                  style={{ height: '200px', objectFit: 'cover' }}
+                />
+                <Card.Body className="d-flex flex-column">
+                  <Card.Title>{book.title}</Card.Title>
+                  <Card.Text>
+                    <strong>Author(s):</strong> {book.authors.join(', ')}
+                  </Card.Text>
+                  <Card.Text>{book.description}</Card.Text>
+                  <a
+                    href={book.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-primary mt-auto"
+                  >
+                    View on Google Books
+                  </a>
+                  <Button
+                    className="btn btn-danger mt-2"
+                    onClick={() => handleRemoveBook(book._id)}
+                  >
+                    Remove
+                  </Button>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
         </Row>
-      </Container>
-    </>
+      )}
+    </Container>
   );
 };
 
