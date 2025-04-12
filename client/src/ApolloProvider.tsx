@@ -8,6 +8,8 @@ const httpLink = createHttpLink({
 
 const authLink = setContext((_, { headers }) => {
   const token = localStorage.getItem('id_token');
+  console.log('AuthLink Middleware Executed'); // Debugging line
+  console.log('Token:', token); // Debugging line
   return {
     headers: {
       ...headers,
