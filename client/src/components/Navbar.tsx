@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Navbar, Nav, Container, Modal, Tab, Form, Button } from 'react-bootstrap';
+import { Navbar, Nav, Container, Modal, Tab} from 'react-bootstrap';
+//import { Navbar, Nav, Container, Modal, Tab, Form, Button } from 'react-bootstrap';
 import SignUpForm from './SignupForm';
 import LoginForm from './LoginForm';
 import SearchResults from './SearchResults';  
@@ -11,10 +12,11 @@ import Auth from '../utils/auth';
 const AppNavbar = () => {
   // set modal display state
   const [showModal, setShowModal] = useState(false);
-  const [searchInput, setSearchInput] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
+  //const [searchInput, setSearchInput] = useState('');
+  //const [searchResults, setSearchResults] = useState([]);
+  const [searchResults] = useState([]);
 
-  const handleSearchSubmit = async (e: React.FormEvent) => {
+/*   const handleSearchSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchInput.trim()) {
       setSearchResults([]);
@@ -28,7 +30,7 @@ const AppNavbar = () => {
       console.error(err);
     }
     setSearchInput('');
-  };
+  }; */
 
   return (
     <>
@@ -43,7 +45,7 @@ const AppNavbar = () => {
               <Nav.Link as={Link} to='/'>
                 Search For Books
               </Nav.Link>
-              {/* Search input field */}
+              {/* Search input field 
               <Form className='d-flex' onSubmit={handleSearchSubmit}>
                 <Form.Control
                   type='text'
@@ -55,7 +57,7 @@ const AppNavbar = () => {
                 <Button type='submit' variant='outline-light'>
                   Submit
                 </Button>
-              </Form>
+              </Form>*/}
               {/* if user is logged in show saved books and logout */}
               {Auth.loggedIn() ? (
                 <>
