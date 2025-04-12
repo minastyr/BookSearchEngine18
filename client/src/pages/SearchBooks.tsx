@@ -72,13 +72,22 @@ const SearchBooks = () => {
   // create function to handle saving a book to our database
   const handleSaveBook = async (bookId: string) => {
     const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
-  
+
     if (!bookToSave) {
       console.error('Book not found in searchedBooks');
       return;
     }
-  
+
     try {
+      console.log('Saving book with variables:', {
+        bookId: bookToSave.bookId,
+        title: bookToSave.title,
+        authors: bookToSave.authors,
+        description: bookToSave.description,
+        image: bookToSave.image,
+        link: bookToSave.link,
+      });
+
       const { data } = await saveBook({
         variables: {
           bookId: bookToSave.bookId,
@@ -86,12 +95,12 @@ const SearchBooks = () => {
           authors: bookToSave.authors,
           description: bookToSave.description,
           image: bookToSave.image,
-          link: '', // Add a link if available
+          link: bookToSave.link,
         },
       });
+
       console.log('Saved book:', data);
-  
-      // Update savedBookIds state
+
       setSavedBookIds([...savedBookIds, bookId]);
     } catch (err) {
       console.error('Error saving book:', err);
