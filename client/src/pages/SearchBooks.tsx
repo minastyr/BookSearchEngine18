@@ -26,6 +26,7 @@ const SearchBooks = () => {
 
   // create state to hold saved bookId values
   const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
+  console.log('Saved book IDs:', savedBookIds);
 
   // set up useEffect hook to save `savedBookIds` list to localStorage on component unmount
   useEffect(() => {
@@ -106,6 +107,7 @@ const SearchBooks = () => {
             <Row>
               <Col xs={12} md={8}>
                 <Form.Control
+                  id="searchInput"
                   name='searchInput'
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
