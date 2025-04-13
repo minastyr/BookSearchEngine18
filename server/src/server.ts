@@ -32,12 +32,17 @@ app.get('*', (_req, res) => {
 app.use((req, _res, next) => {
   const token = req.headers.authorization || '';
   console.log('Token from server.ts middleware:', token);
+
   if (token) {
     try {
       if (!process.env.JWT_SECRET_KEY) {
         throw new Error('JWT_SECRET_KEY is not defined in environment variables');
       }
-      const user = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+
+      // Remove "Bearer " prefix if it exists
+      const actualToken = token.startsWith('Bearer ') ? token.split(' ')[1] : token;
+
+      const user = jwt.verify(actualToken, process.env.JWT_SECRET_KEY as string);
       (req as any).user = user; // Temporary cast if needed
       console.log('Authenticated user from server.ts middleware call:', user);
     } catch (err) {
