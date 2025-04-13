@@ -38,6 +38,7 @@ app.use((req, _res, next) => {
       }
       const user = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
       (req as any).user = user; // Temporary cast if needed
+      console.log('Authenticated user from server.ts middleware call:', user);
     } catch (err) {
       console.warn('Invalid token');
     }
