@@ -78,30 +78,37 @@ const resolvers = {
       { bookId, title, authors, description, image, link }: { bookId: string; title: string; authors: string[]; description: string; image: string; link: string },
       context: Context
     ) => {
-      console.log('Input variables:', { bookId, title, authors, description, image, link }); // Add this line
-      console.log('Context user:', context.user); // Add this line
-      if (!context.user) {
-        throw new AuthenticationError('Not logged in');
-      }
-      if (!bookId || !title) {
-        throw new Error('Book ID and title are required');
-      }
       try {
+        console.log('Context user:', context.user); // Debugging line
+        console.log('Input variables:', { bookId, title, authors, description, image, link }); // Debugging line
+
+        if (!context.user) {
+          throw new AuthenticationError('Not logged in');
+        }
+
+        // Check if the user exists
         const user = await User.findById(context.user._id);
-        console.log('User found in database:', user);
+        console.log('User found in database:', user); // Debugging line
         if (!user) {
           throw new Error('User not found');
         }
 
+        // Save the book to the user's savedBooks array
         const updatedUser = await User.findByIdAndUpdate(
-          context.user.id,
+          context.user._id,
           { $addToSet: { savedBooks: { bookId, title, authors, description, image, link } } },
           { new: true }
-        ).populate('savedBooks');
+        );
+
+        console.log('Updated user:', updatedUser); // Debugging line
+        if (!updatedUser) {
+          throw new Error('Failed to save book');
+        }
+
         return updatedUser;
       } catch (err) {
-        handleError(err, 'Failed to save book');
-        return null;
+        console.error('Error in saveBook resolver:', err); // Debugging line
+        throw new Error('Failed to save book');
       }
     },
 
