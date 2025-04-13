@@ -87,7 +87,8 @@ const resolvers = {
         throw new Error('Book ID and title are required');
       }
       try {
-        const user = await User.findById(context.user.id);
+        const user = await User.findById(context.user._id);
+        console.log('User found in database:', user);
         if (!user) {
           throw new Error('User not found');
         }
