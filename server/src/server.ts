@@ -31,6 +31,7 @@ app.get('*', (_req, res) => {
 // Middleware for authentication
 app.use((req, _res, next) => {
   const token = req.headers.authorization || '';
+  console.log('Token from server.ts middleware:', token);
   if (token) {
     try {
       if (!process.env.JWT_SECRET_KEY) {
@@ -40,7 +41,8 @@ app.use((req, _res, next) => {
       (req as any).user = user; // Temporary cast if needed
       console.log('Authenticated user from server.ts middleware call:', user);
     } catch (err) {
-      console.warn('Invalid token');
+      console.warn('Invalid token-generated from server.ts middleware:', err);
+      console.log('invalid user from server.ts middleware call:', (req as any).user);
     }
   }
   next();
