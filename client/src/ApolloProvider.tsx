@@ -4,7 +4,7 @@ import { setContext } from '@apollo/client/link/context';
 
 
 const httpLink = createHttpLink({
-  uri: process.env.REACT_APP_GRAPHQL_URI || 'http://localhost:4000/graphql',
+  uri: 'https://booksearchengine18.onrender.com/graphql',
 });
 
 console.log('HTTP Link Created at:', process.env.REACT_APP_GRAPHQL_URI); // Debugging line
