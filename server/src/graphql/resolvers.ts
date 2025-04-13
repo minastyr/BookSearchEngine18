@@ -120,13 +120,13 @@ const resolvers = {
         throw new Error('Book ID is required');
       }
       try {
-        const user = await User.findById(context.user.id);
+        const user = await User.findById(context.user._id);
         if (!user) {
           throw new Error('User not found');
         }
 
         const updatedUser = await User.findByIdAndUpdate(
-          context.user.id,
+          context.user._id,
           { $pull: { savedBooks: { bookId } } },
           { new: true }
         ).populate('savedBooks');
