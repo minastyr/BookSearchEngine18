@@ -10,7 +10,7 @@ import {
 
 import Auth from '../utils/auth';
 import { useMutation } from '@apollo/client';
-import { SAVE_BOOK } from '../utils/graphql';
+import { SAVE_BOOK, GET_ME } from '../utils/graphql';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 import { searchGoogleBooks } from '../utils/API';
 import type { Book } from '../models/Book';
@@ -33,7 +33,7 @@ const SearchBooks = () => {
     return () => saveBookIds(savedBookIds);
   }, [savedBookIds]);
 
-  const [saveBook] = useMutation(SAVE_BOOK);
+  const [saveBook] = useMutation(SAVE_BOOK, { refetchQueries: [{query: GET_ME}],});
 
   // create method to search for books and set state on form submit
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
