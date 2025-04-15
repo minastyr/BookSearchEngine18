@@ -14,9 +14,9 @@ const resolvers = {
         throw new AuthenticationError('Not logged in');
       }
       try {
-        const user = await User.findById(context.user.id).populate('savedBooks');
+        const user = await User.findById(context.user._id).populate('savedBooks');
         if (!user) {
-          throw new Error('User not found');
+          throw new Error(`User not found with ID: ${context.user._id}`);
         }
         return user;
       } catch (err) {
@@ -45,7 +45,7 @@ const resolvers = {
         const token = jwt.sign(
           { _id: user._id, email: user.email, username: user.username },
           process.env.JWT_SECRET_KEY || 'default_secret',
-          { expiresIn: '1h' }
+          { expiresIn: '10h' }
         );
         return { token, user };
       } catch (err) {
@@ -65,7 +65,7 @@ const resolvers = {
         }
 
         const user = await User.create({ username, email, password });
-        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY || '', { expiresIn: '2h' });
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY || '', { expiresIn: '10h' });
         return { token, user };
       } catch (err) {
         handleError(err, 'Failed to create user');
