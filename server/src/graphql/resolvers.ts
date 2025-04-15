@@ -87,10 +87,10 @@ const resolvers = {
         }
 
         // Check if the user exists
-        const user = await User.findById(context.user._id);
+        const user = await User.findById(context.user._id).populate('savedBooks');
         console.log('User found in database:', user); // Debugging line
         if (!user) {
-          throw new Error('User not found');
+          throw new Error(`User not found with ID: ${context.user._id}`);
         }
 
         // Save the book to the user's savedBooks array
@@ -120,7 +120,7 @@ const resolvers = {
         throw new Error('Book ID is required');
       }
       try {
-        const user = await User.findById(context.user._id);
+        const user = await User.findById(context.user._id).populate('savedBooks');
         if (!user) {
           throw new Error('User not found');
         }
