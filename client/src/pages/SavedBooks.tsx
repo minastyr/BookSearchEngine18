@@ -26,6 +26,7 @@ const SavedBooks = () => {
 
   useEffect(() => {
     if (data && data.me) {
+      console.log('Saved books:', data.me.savedBooks); // Debugging line
       setSavedBooks(data.me.savedBooks);
       setLoading(false);
     }
