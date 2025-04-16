@@ -49,6 +49,7 @@ const SavedBooks = () => {
       if (data?.removeBook) {
         console.log('Book removed successfully from MongoDB:', data.removeBook);
         setSavedBooks(savedBooks.filter((book) => book._id !== bookId));
+        console.log('handleRemoveBook Saved books:', savedBooks);
       } else {
         console.error('Failed to remove book from MongoDB:', data);
       }

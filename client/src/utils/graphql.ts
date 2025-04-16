@@ -8,7 +8,7 @@ export const GET_ME = gql`
       username
       email
       savedBooks {
-        bookId
+        _id
         title
         authors
         description
@@ -65,7 +65,7 @@ export const SAVE_BOOK = gql`
 `;
 
 export const REMOVE_BOOK = gql`
-  mutation RemoveBook($bookId: String!) {
+  mutation RemoveBook($bookId: ID!) {
     removeBook(bookId: $bookId) {
       _id
       username
