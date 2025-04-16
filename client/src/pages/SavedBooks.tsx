@@ -36,6 +36,7 @@ const SavedBooks = () => {
   }, [data, queryError]);
 
   const handleRemoveBook = async (bookId: string) => {
+    console.log('Removing book with ID:', bookId);
     const confirmRemove = window.confirm('Are you sure you want to remove this book?');
     if (!confirmRemove) return;
 
@@ -45,7 +46,10 @@ const SavedBooks = () => {
       });
 
       if (data?.removeBook) {
-        setSavedBooks(savedBooks.filter((book) => book._id !== bookId));
+        setSavedBooks(savedBooks.filter((book) => {
+          console.log('Book ID to remove:', book._id);
+          return book._id !== bookId;
+        }));
         removeBookId(bookId);
       }
     } catch (err) {
