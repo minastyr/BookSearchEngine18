@@ -47,14 +47,13 @@ const SavedBooks = () => {
       });
 
       if (data?.removeBook) {
-        setSavedBooks(savedBooks.filter((book) => {
-          console.log('Book ID to remove:', book._id);
-          return book._id !== bookId;
-        }));
-        removeBookId(bookId);
+        console.log('Book removed successfully from MongoDB:', data.removeBook);
+        setSavedBooks(savedBooks.filter((book) => book._id !== bookId));
+      } else {
+        console.error('Failed to remove book from MongoDB:', data);
       }
     } catch (err) {
-      console.error(err);
+      console.error('Error removing book from MongoDB:', err);
     }
   };
 
