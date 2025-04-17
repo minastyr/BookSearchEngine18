@@ -161,7 +161,8 @@ const resolvers = {
 
         return updatedUser;
       } catch (err) {
-        console.error(`Error in removeBook resolver: ${err.message}`, err);
+        const errorMessage = (err instanceof Error && err.message) ? err.message : 'Unknown error';
+        console.error(`Error in removeBook resolver: ${errorMessage}`, err);
         throw new Error('Failed to remove book. Please try again later.');
       }
     },
