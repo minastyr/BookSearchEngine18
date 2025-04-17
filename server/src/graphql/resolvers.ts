@@ -138,13 +138,15 @@ const resolvers = {
       if (!context.user) {
         throw new AuthenticationError('Not logged in');
       }
-      if (!bookId) {
-        throw new Error('Book ID is required');
+
+      if (!bookId || typeof bookId !== 'string') {
+        throw new Error('Invalid or missing Book ID');
       }
+
       try {
-        const user = await User.findById(context.user._id).populate('savedBooks');
+        const user = await User.findById(context.user._id);
         if (!user) {
-          throw new Error('User not found');
+          throw new Error(`User not found with ID: ${context.user._id}`);
         }
 
         const updatedUser = await User.findByIdAndUpdate(
@@ -152,13 +154,15 @@ const resolvers = {
           { $pull: { savedBooks: { bookId } } },
           { new: true }
         ).populate('savedBooks');
+
         if (!updatedUser) {
-          throw new Error('Failed to remove book');
+          throw new Error(`Failed to remove book with ID: ${bookId}`);
         }
+
         return updatedUser;
       } catch (err) {
-        handleError(err, 'Failed to remove book');
-        return null;
+        console.error(`Error in removeBook resolver: ${err.message}`, err);
+        throw new Error('Failed to remove book. Please try again later.');
       }
     },
   },
