@@ -86,6 +86,17 @@ const resolvers = {
           throw new AuthenticationError('Not logged in');
         }
 
+        // Ensure HTTPS for image and link
+        const ensureHttps = (url: string): string => {
+          if (url && url.startsWith('http://')) {
+            return url.replace('http://', 'https://');
+          }
+          return url;
+        };
+
+        const secureImage = ensureHttps(image);
+        const secureLink = ensureHttps(link);
+
         // Check if the user exists
         const user = await User.findById(context.user._id).populate('savedBooks');
         console.log('User found in database:', user); // Debugging line
@@ -96,7 +107,18 @@ const resolvers = {
         // Save the book to the user's savedBooks array
         const updatedUser = await User.findByIdAndUpdate(
           context.user._id,
-          { $addToSet: { savedBooks: { bookId, title, authors, description, image, link } } },
+          {
+            $addToSet: {
+              savedBooks: {
+                bookId,
+                title,
+                authors,
+                description,
+                image: secureImage, // Use HTTPS-secured image
+                link: secureLink,   // Use HTTPS-secured link
+              },
+            },
+          },
           { new: true }
         );
 
