@@ -2,6 +2,8 @@ import { gql } from 'apollo-server-express';
 
 const typeDefs = gql`
   type Book {
+    
+    _id: ID
     bookId: String!
     title: String!
     authors: [String]
