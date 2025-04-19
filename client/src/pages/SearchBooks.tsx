@@ -1,4 +1,4 @@
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, FormEvent } from 'react';
 import {
   Container,
   Col,
@@ -9,14 +9,11 @@ import {
 } from 'react-bootstrap';
 
 import Auth from '../utils/auth';
-import { useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { SAVE_BOOK, GET_ME } from '../utils/graphql';
-import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 import { searchGoogleBooks } from '../utils/API';
 import type { Book } from '../models/Book';
 import type { GoogleAPIBook } from '../types/GoogleAPIBook';
-//console.log('SearchBooks component reached');
-//console.log('Is user logged in?', Auth.loggedIn());
 
 const SearchBooks = () => {
   // create state for holding returned google api data
@@ -24,22 +21,22 @@ const SearchBooks = () => {
   // create state for holding our search field data
   const [searchInput, setSearchInput] = useState('');
 
-  // create state to hold saved bookId values
-  const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
-  console.log('Saved book IDs:', savedBookIds);
+  // Get user's saved books from Apollo cache
+  const { data } = useQuery(GET_ME, {
+    skip: !Auth.loggedIn(),
+  });
+  
+  // Extract saved bookIds from Apollo cache
+  const savedBookIds = data?.me?.savedBooks.map((book: Book) => book.bookId) || [];
 
-  // set up useEffect hook to save `savedBookIds` list to localStorage on component unmount
-  useEffect(() => {
-    return () => saveBookIds(savedBookIds);
-  }, [savedBookIds]);
-
-  const [saveBook] = useMutation(SAVE_BOOK, { refetchQueries: [{query: GET_ME}],});
+  const [saveBook] = useMutation(SAVE_BOOK, { 
+    refetchQueries: [{query: GET_ME}],
+  });
 
   // create method to search for books and set state on form submit
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     
-
     if (!searchInput) {
       return false;
     }
@@ -79,16 +76,7 @@ const SearchBooks = () => {
     }
 
     try {
-      console.log('Saving book with variables:', {
-        bookId: bookToSave.bookId,
-        title: bookToSave.title,
-        authors: bookToSave.authors,
-        description: bookToSave.description,
-        image: bookToSave.image,
-        link: bookToSave.link,
-      });
-
-      const { data } = await saveBook({
+      await saveBook({
         variables: {
           bookId: bookToSave.bookId,
           title: bookToSave.title,
@@ -98,10 +86,8 @@ const SearchBooks = () => {
           link: bookToSave.link,
         },
       });
-
-      console.log('Saved book:', data);
-
-      setSavedBookIds([...savedBookIds, bookId]);
+      
+      // No need to update local state - refetchQueries will update the Apollo cache
     } catch (err) {
       console.error('Error saving book:', err);
     }
@@ -151,14 +137,14 @@ const SearchBooks = () => {
                   ) : null}
                   <Card.Body>
                     <Card.Title>{book.title}</Card.Title>
-                    <p className='small'>Authors: {book.authors}</p>
+                    <p className='small'>Authors: {book.authors.join(', ')}</p>
                     <Card.Text>{book.description}</Card.Text>
                     {Auth.loggedIn() && (
                       <Button
-                        disabled={savedBookIds?.some((savedBookId: string) => savedBookId === book.bookId)}
+                        disabled={savedBookIds.includes(book.bookId)}
                         className='btn-block btn-info'
                         onClick={() => handleSaveBook(book.bookId)}>
-                        {savedBookIds?.some((savedBookId: string) => savedBookId === book.bookId)
+                        {savedBookIds.includes(book.bookId)
                           ? 'This book has already been saved!'
                           : 'Save this Book!'}
                       </Button>
