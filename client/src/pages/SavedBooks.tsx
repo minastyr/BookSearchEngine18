@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Container, Card, Button, Row, Col } from 'react-bootstrap';
-//import Auth from '../utils/auth';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_ME, REMOVE_BOOK } from '../utils/graphql';
-import { removeBookId } from '../utils/localStorage';
 
 type Book = {
   _id: string;
+  bookId: string;
   title: string;
   authors: string[];
   description: string;
@@ -22,11 +21,12 @@ const SavedBooks = () => {
   const navigate = useNavigate();
 
   const { data, loading: queryLoading, error: queryError } = useQuery(GET_ME);
-  const [removeBook] = useMutation(REMOVE_BOOK);
+  const [removeBook] = useMutation(REMOVE_BOOK, {
+    refetchQueries: [{ query: GET_ME }],
+  });
 
   useEffect(() => {
     if (data && data.me) {
-      console.log('Saved books:', data.me.savedBooks); // Debugging line
       setSavedBooks(data.me.savedBooks);
       setLoading(false);
     }
@@ -36,23 +36,25 @@ const SavedBooks = () => {
     }
   }, [data, queryError]);
 
-  const handleRemoveBook = async (bookId: string) => {
-    console.log('Removing book with ID:', bookId);
+  const handleRemoveBook = async (mongoId: string) => {
     const confirmRemove = window.confirm('Are you sure you want to remove this book?');
     if (!confirmRemove) return;
 
     try {
+      const bookToRemove = savedBooks.find((book) => book._id === mongoId);
+      
+      if (!bookToRemove) {
+        return;
+      }
+      
       const { data } = await removeBook({
-        variables: { bookId },
+        variables: { bookId: bookToRemove.bookId },
       });
 
-      if (data?.removeBook) {
-        console.log('Book removed successfully from MongoDB:', data.removeBook);
-        setSavedBooks(savedBooks.filter((book) => book._id !== bookId));
-        console.log('handleRemoveBook Saved books:', savedBooks);
-      } else {
+      if (!data?.removeBook) {
         console.error('Failed to remove book from MongoDB:', data);
       }
+      // Let refetchQueries handle state update
     } catch (err) {
       console.error('Error removing book from MongoDB:', err);
     }

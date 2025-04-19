@@ -149,6 +149,12 @@ const resolvers = {
           throw new Error(`User not found with ID: ${context.user._id}`);
         }
 
+        // Log the user's saved books for debugging
+        console.log('Current saved books:', user.savedBooks.map(book => ({ 
+          bookId: book.bookId, 
+          title: book.title 
+        })));
+
         const updatedUser = await User.findByIdAndUpdate(
           context.user._id,
           { $pull: { savedBooks: { bookId } } },
@@ -161,6 +167,7 @@ const resolvers = {
 
         return updatedUser;
       } catch (err) {
+        // More detailed error handling
         const errorMessage = (err instanceof Error && err.message) ? err.message : 'Unknown error';
         console.error(`Error in removeBook resolver: ${errorMessage}`, err);
         throw new Error('Failed to remove book. Please try again later.');
