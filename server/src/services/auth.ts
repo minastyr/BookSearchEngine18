@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const secret = process.env.JWT_SECRET_KEY || 'your_jwt_secret';
+//const secret = process.env.JWT_SECRET_KEY || 'your_jwt_secret';
 
 interface JwtPayload {
   _id: string;
