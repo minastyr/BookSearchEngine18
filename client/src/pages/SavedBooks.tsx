@@ -48,7 +48,7 @@ const SavedBooks = () => {
       }
       
       const { data } = await removeBook({
-        variables: { bookId: bookToRemove.bookId },
+        variables: { bookId },
       });
 
       if (!data?.removeBook) {
@@ -125,7 +125,7 @@ const SavedBooks = () => {
                   </a>
                   <Button
                     className="btn btn-danger mt-2"
-                    onClick={() => handleRemoveBook(book._id)}
+                    onClick={() => handleRemoveBook(book.bookId)}
                   >
                     Remove
                   </Button>
