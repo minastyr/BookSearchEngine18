@@ -36,12 +36,12 @@ const SavedBooks = () => {
     }
   }, [data, queryError]);
 
-  const handleRemoveBook = async (mongoId: string) => {
+  const handleRemoveBook = async (bookId: string) => {
     const confirmRemove = window.confirm('Are you sure you want to remove this book?');
     if (!confirmRemove) return;
 
     try {
-      const bookToRemove = savedBooks.find((book) => book._id === mongoId);
+      const bookToRemove = savedBooks.find((book) => book._id === bookId);
       
       if (!bookToRemove) {
         return;
