@@ -1,4 +1,5 @@
-import express, { Application } from 'express';
+import express, { Application, Request } from 'express';
+//import * as Express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import dotenv from 'dotenv';
 import typeDefs from './graphql/typeDefs.js';
@@ -53,15 +54,61 @@ app.use((req, _res, next) => {
   next();
 });
 
+// Function to verify token
+const verifyToken = (token: string) => {
+  if (!process.env.JWT_SECRET_KEY) {
+    throw new Error('JWT_SECRET_KEY is not defined in environment variables');
+  }
+  return jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+};
+
 // Function to start the server
 const startServer = async () => {
   // Initialize Apollo Server
   const server = new ApolloServer({
     typeDefs,
     resolvers,
-    context: ({ req }: { req: Express.Request }) => {
-      // Pass the authenticated user to the context
-      return { user: req.user };
+    context: ({ req }) => {
+
+      // Use the correct type for the request
+      const request = req as Request;
+      
+      // Get the token from the request headers
+      const authHeader = request.headers.authorization || '';
+      
+      // Split only if authHeader is not empty
+      let token = '';
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.split(' ')[1];
+      }
+      
+      if (!token) {
+        console.log('No authentication token provided');
+        return { user: null };
+      }
+
+      try {
+        console.log('Token being verified:', token);
+        const user = verifyToken(token);
+        console.log('User from token verification:', JSON.stringify(user));
+        
+        // Check if the user object has an _id property
+        if (user && typeof user === 'object' && '_id' in user) {
+          console.log('User has _id property:', user._id);
+        } else {
+          console.log('User object structure:', user);
+          // If user doesn't have _id, create a modified user object with _id
+          if (user && typeof user === 'object' && 'id' in user) {
+            (user as any)._id = (user as any).id;
+            console.log('Modified user object:', user);
+          }
+        }
+        
+        return { user };
+      } catch (err) {
+        console.error('Error verifying token in context:', err);
+        return { user: null };
+      }
     },
     cache: "bounded",
   });
