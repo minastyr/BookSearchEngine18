@@ -41,8 +41,11 @@ export const signToken = (username: string, email: string, _id: unknown) => {
 
 export const verifyToken = (token: string) => {
   try {
-    return jwt.verify(token, secret);
+    // Use the same secret as signToken
+    const secretKey = process.env.JWT_SECRET_KEY || 'default_secret';
+    return jwt.verify(token, secretKey);
   } catch (error) {
+    console.error('Token verification failed:', error);
     return null;
   }
 };
