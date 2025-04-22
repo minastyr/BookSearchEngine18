@@ -14,6 +14,14 @@ type Book = {
   link: string;
 };
 
+const ensureHttps = (url: string | null | undefined): string => {
+  if (!url) return '';
+  if (url.startsWith('http://')) {
+    return url.replace('http://', 'https://');
+  }
+  return url;
+};
+
 const SavedBooks = () => {
   const [savedBooks, setSavedBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
@@ -104,7 +112,7 @@ const SavedBooks = () => {
             <Col key={book._id} md="4" className="mb-4">
               <Card className="h-100">
                 <Card.Img
-                  src={book.image}
+                  src={ensureHttps(book.image)}
                   alt={book.title}
                   style={{ height: '200px', objectFit: 'cover' }}
                 />
@@ -115,7 +123,7 @@ const SavedBooks = () => {
                   </Card.Text>
                   <Card.Text>{book.description}</Card.Text>
                   <a
-                    href={book.link}
+                    href={ensureHttps(book.link)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-primary mt-auto"
