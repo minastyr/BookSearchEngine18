@@ -86,14 +86,16 @@ const resolvers = {
           throw new AuthenticationError('Not logged in');
         }
 
-        // Ensure HTTPS for image and link
-        const ensureHttps = (url: string): string => {
-          if (url && url.startsWith('http://')) {
+        // Improved HTTPS conversion function
+        const ensureHttps = (url: string | null | undefined): string => {
+          if (!url) return '';
+          if (url.startsWith('http://')) {
             return url.replace('http://', 'https://');
           }
           return url;
         };
 
+        // Apply HTTPS conversion to both image and link
         const secureImage = ensureHttps(image);
         const secureLink = ensureHttps(link);
 
