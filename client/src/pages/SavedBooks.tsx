@@ -41,11 +41,7 @@ const SavedBooks = () => {
     if (!confirmRemove) return;
 
     try {
-      const bookToRemove = savedBooks.find((book) => book._id === bookId);
-      
-      if (!bookToRemove) {
-        return;
-      }
+      console.log('Removing book with bookId:', bookId);
       
       const { data } = await removeBook({
         variables: { bookId },
@@ -53,7 +49,10 @@ const SavedBooks = () => {
 
       if (!data?.removeBook) {
         console.error('Failed to remove book from MongoDB:', data);
+      } else {
+        console.log('Book removed successfully:', data);
       }
+      
       // Let refetchQueries handle state update
     } catch (err) {
       console.error('Error removing book from MongoDB:', err);
