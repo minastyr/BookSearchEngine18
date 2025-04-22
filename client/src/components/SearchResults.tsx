@@ -15,7 +15,8 @@ const SearchResults = ({ results }: { results: any[] }) => {
               <div className="card-body">
                 <h5 className="card-title">{book.volumeInfo.title}</h5>
                 <p className="card-text">
-                  <strong>Author(s):</strong> {book.volumeInfo.authors?.join(', ')}
+                  <strong>Author(s):</strong>{" "}
+                  {book.volumeInfo.authors?.join(", ")}
                 </p>
                 <p className="card-text">{book.volumeInfo.description}</p>
                 <a

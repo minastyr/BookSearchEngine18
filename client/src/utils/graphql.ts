@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 // Queries
 export const GET_ME = gql`
@@ -47,8 +47,22 @@ export const ADD_USER = gql`
 `;
 
 export const SAVE_BOOK = gql`
-  mutation SaveBook($bookId: String!, $title: String!, $authors: [String], $description: String, $image: String, $link: String) {
-    saveBook(bookId: $bookId, title: $title, authors: $authors, description: $description, image: $image, link: $link) {
+  mutation SaveBook(
+    $bookId: String!
+    $title: String!
+    $authors: [String]
+    $description: String
+    $image: String
+    $link: String
+  ) {
+    saveBook(
+      bookId: $bookId
+      title: $title
+      authors: $authors
+      description: $description
+      image: $image
+      link: $link
+    ) {
       _id
       username
       email

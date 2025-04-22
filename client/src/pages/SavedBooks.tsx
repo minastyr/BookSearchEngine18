@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
-import { Container, Card, Button, Row, Col } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
-import { useQuery, useMutation } from '@apollo/client';
-import { GET_ME, REMOVE_BOOK } from '../utils/graphql';
+import { useEffect, useState } from "react";
+import { Container, Card, Button, Row, Col } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { useQuery, useMutation } from "@apollo/client";
+import { GET_ME, REMOVE_BOOK } from "../utils/graphql";
 
 type Book = {
   _id: string;
@@ -15,9 +15,9 @@ type Book = {
 };
 
 const ensureHttps = (url: string | null | undefined): string => {
-  if (!url) return '';
-  if (url.startsWith('http://')) {
-    return url.replace('http://', 'https://');
+  if (!url) return "";
+  if (url.startsWith("http://")) {
+    return url.replace("http://", "https://");
   }
   return url;
 };
@@ -39,37 +39,38 @@ const SavedBooks = () => {
       setLoading(false);
     }
     if (queryError) {
-      setError('Failed to load saved books. Please try again later.');
+      setError("Failed to load saved books. Please try again later.");
       setLoading(false);
     }
   }, [data, queryError]);
 
   const handleRemoveBook = async (bookId: string) => {
-    const confirmRemove = window.confirm('Are you sure you want to remove this book?');
+    const confirmRemove = window.confirm(
+      "Are you sure you want to remove this book?"
+    );
     if (!confirmRemove) return;
 
     try {
-      console.log('Removing book with bookId:', bookId);
-      
       const { data } = await removeBook({
         variables: { bookId },
       });
 
       if (!data?.removeBook) {
-        console.error('Failed to remove book from MongoDB:', data);
-      } else {
-        console.log('Book removed successfully:', data);
+        console.error("Failed to remove book from MongoDB:", data);
       }
-      
+
       // Let refetchQueries handle state update
     } catch (err) {
-      console.error('Error removing book from MongoDB:', err);
+      console.error("Error removing book from MongoDB:", err);
     }
   };
 
   if (loading || queryLoading) {
     return (
-      <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: "100vh" }}
+      >
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -83,10 +84,7 @@ const SavedBooks = () => {
         <div className="alert alert-danger text-center" role="alert">
           {error}
         </div>
-        <button
-          className="btn btn-secondary"
-          onClick={() => navigate('/')}
-        >
+        <button className="btn btn-secondary" onClick={() => navigate("/")}>
           Back to Search
         </button>
       </div>
@@ -95,10 +93,7 @@ const SavedBooks = () => {
 
   return (
     <Container className="my-4">
-      <Button
-        className="btn btn-secondary mb-4"
-        onClick={() => navigate('/')}
-      >
+      <Button className="btn btn-secondary mb-4" onClick={() => navigate("/")}>
         Back to Search
       </Button>
       <h2 className="text-center mb-4">Your Saved Books</h2>
@@ -114,12 +109,12 @@ const SavedBooks = () => {
                 <Card.Img
                   src={ensureHttps(book.image)}
                   alt={book.title}
-                  style={{ height: '200px', objectFit: 'cover' }}
+                  style={{ height: "200px", objectFit: "cover" }}
                 />
                 <Card.Body className="d-flex flex-column">
                   <Card.Title>{book.title}</Card.Title>
                   <Card.Text>
-                    <strong>Author(s):</strong> {book.authors.join(', ')}
+                    <strong>Author(s):</strong> {book.authors.join(", ")}
                   </Card.Text>
                   <Card.Text>{book.description}</Card.Text>
                   <a

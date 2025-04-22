@@ -4,7 +4,7 @@ import { jwtDecode } from "jwt-decode";
 class AuthService {
   // Get token from localStorage
   getToken() {
-    return localStorage.getItem('id_token');
+    return localStorage.getItem("id_token");
   }
 
   // Decode token and check if expired
@@ -25,14 +25,14 @@ class AuthService {
 
   // Save token to localStorage
   login(idToken: string) {
-    localStorage.setItem('id_token', idToken);
-    window.location.assign('/');
+    localStorage.setItem("id_token", idToken);
+    window.location.assign("/");
   }
 
   // Remove token from localStorage
   logout() {
-    localStorage.removeItem('id_token');
-    window.location.assign('/');
+    localStorage.removeItem("id_token");
+    window.location.assign("/");
   }
 }
 

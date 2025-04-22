@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { useMutation } from '@apollo/client';
-import { LOGIN_USER } from '../utils/graphql';
-import Auth from '../utils/auth';
-import { Form, Button } from 'react-bootstrap';
+import { useState } from "react";
+import { useMutation } from "@apollo/client";
+import { LOGIN_USER } from "../utils/graphql";
+import Auth from "../utils/auth";
+import { Form, Button } from "react-bootstrap";
 
 const LoginForm = ({ handleModalClose }: { handleModalClose: () => void }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [login, { error }] = useMutation(LOGIN_USER);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -21,7 +21,7 @@ const LoginForm = ({ handleModalClose }: { handleModalClose: () => void }) => {
         handleModalClose();
       }
     } catch (err) {
-      console.error('Login error:', err);
+      console.error("Login error:", err);
     }
   };
 

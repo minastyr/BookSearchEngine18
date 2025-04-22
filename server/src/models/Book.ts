@@ -1,4 +1,4 @@
-import { Schema, type Document } from 'mongoose';
+import { Schema, type Document } from "mongoose";
 
 export interface BookDocument extends Document {
   bookId: string;

@@ -10,6 +10,6 @@ export interface GoogleAPIVolumeInfo {
 }
 
 export interface GoogleAPIBook {
-    id: string;
-    volumeInfo: GoogleAPIVolumeInfo;
+  id: string;
+  volumeInfo: GoogleAPIVolumeInfo;
 }
