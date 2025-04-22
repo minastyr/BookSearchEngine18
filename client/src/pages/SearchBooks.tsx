@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useMemo } from 'react';
 import {
   Container,
   Col,
@@ -22,12 +22,15 @@ const SearchBooks = () => {
   const [searchInput, setSearchInput] = useState('');
 
   // Get user's saved books from Apollo cache
-  const { data } = useQuery(GET_ME, {
+  const { data, loading: meLoading } = useQuery(GET_ME, {
     skip: !Auth.loggedIn(),
   });
-  
+
   // Extract saved bookIds from Apollo cache
-  const savedBookIds = data?.me?.savedBooks.map((book: Book) => book.bookId) || [];
+  const savedBookIds = useMemo(() => {
+    if (meLoading || !data?.me) return [];
+    return data.me.savedBooks.map((book: Book) => book.bookId) || [];
+  }, [data, meLoading]);
 
   const [saveBook] = useMutation(SAVE_BOOK, { 
     refetchQueries: [{query: GET_ME}],
